@@ -1,0 +1,34 @@
+gcc -std=c11 -Wall -Wextra -pedantic `pkg-config --cflags gtk+-3.0` -c main.c -o main.o
+main.c: In function ‘on_row_activated’:
+main.c:180:14: warning: unused variable ‘app’ [-Wunused-variable]
+  180 |     AppData *app = (AppData *)user_data;
+      |              ^~~
+main.c:179:49: warning: unused parameter ‘column’ [-Wunused-parameter]
+  179 |                              GtkTreeViewColumn *column, gpointer user_data) {
+      |                              ~~~~~~~~~~~~~~~~~~~^~~~~~
+main.c: In function ‘update_parent_combo’:
+main.c:250:5: warning: ISO C forbids nested functions [-Wpedantic]
+  250 |     void add_items_recursive(MenuItem *item, const char *path) {
+      |     ^~~~
+main.c: In function ‘on_add_item_clicked’:
+main.c:278:44: warning: unused parameter ‘button’ [-Wunused-parameter]
+  278 | static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
+      |                                 ~~~~~~~~~~~^~~~~~
+main.c: In function ‘on_window_delete’:
+main.c:332:5: warning: ISO C forbids nested functions [-Wpedantic]
+  332 |     void free_items_recursive(MenuItem *item) {
+      |     ^~~~
+main.c:329:45: warning: unused parameter ‘widget’ [-Wunused-parameter]
+  329 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+      |                                  ~~~~~~~~~~~^~~~~~
+main.c:329:63: warning: unused parameter ‘event’ [-Wunused-parameter]
+  329 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+      |                                                     ~~~~~~~~~~^~~~~
+main.c: In function ‘activate’:
+main.c:353:9: error: ‘AppData’ has no member named ‘window’
+  353 |     data->window = window;
+      |         ^~
+main.c:347:52: warning: unused parameter ‘user_data’ [-Wunused-parameter]
+  347 | static void activate(GtkApplication *app, gpointer user_data) {
+      |                                           ~~~~~~~~~^~~~~~~~~
+make: *** [Makefile:15: main.o] Ошибка 1
