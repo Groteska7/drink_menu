@@ -20,6 +20,7 @@ typedef struct MenuItem {
 typedef struct {
     MenuItem *root;
     MenuItem *selected_item;
+    GtkWidget *window;
     GtkWidget *tree_view;
     GtkWidget *info_label;
     GtkWidget *name_entry;
@@ -177,7 +178,7 @@ static void on_tree_selection_changed(GtkTreeSelection *selection, gpointer user
 
 static void on_row_activated(GtkTreeView *tree_view, GtkTreePath *path,
                              GtkTreeViewColumn *column, gpointer user_data) {
-    AppData *app = (AppData *)user_data;
+    (void)column;
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeIter iter;
     
@@ -186,23 +187,22 @@ static void on_row_activated(GtkTreeView *tree_view, GtkTreePath *path,
         gchar *name;
         gchar *path_str;
         
-        gtk_tree_model_get(model, &iter,
+    gtk_tree_model_get(model, &iter,
                            0, &name,
                            2, &is_category,
                            3, &path_str,
                            -1);
         
-        if (is_category) {
-            if (gtk_tree_view_row_expanded(tree_view, path)) {
-                gtk_tree_view_collapse_row(tree_view, path);
-            } else {
-                gtk_tree_view_expand_to_path(tree_view, path);
-            }
+    if (is_category) {
+        if (gtk_tree_view_row_expanded(tree_view, path)) {
+            gtk_tree_view_collapse_row(tree_view, path);
+        } else {
+            gtk_tree_view_expand_to_path(tree_view, path);
         }
-        
-        g_free(name);
-        g_free(path_str);
     }
+    
+    g_free(name);
+    g_free(path_str);
 }
 
 static GtkTreeStore* create_tree_store() {
@@ -240,6 +240,23 @@ static void refresh_tree_view(AppData *app) {
     g_object_unref(store);
 }
 
+static void add_items_recursive(GtkListStore *list_store, GtkTreeIter *parent_iter,
+                                MenuItem *item, const char *path) {
+    char item_path[MAX_PATH_LEN];
+    snprintf(item_path, sizeof(item_path), "%s%s%s", 
+             path ? path : "", path ? "/" : "", item->name);
+    
+    if (item->is_category) {
+        GtkTreeIter iter;
+        gtk_list_store_append(list_store, &iter);
+        gtk_list_store_set(list_store, &iter, 0, item_path, 1, item->name, -1);
+        
+        for (int i = 0; i < item->child_count; i++) {
+            add_items_recursive(list_store, &iter, item->children[i], item_path);
+        }
+    }
+}
+
 static void update_parent_combo(AppData *app) {
     GtkListStore *list_store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
     GtkTreeIter iter;
@@ -247,23 +264,8 @@ static void update_parent_combo(AppData *app) {
     gtk_list_store_append(list_store, &iter);
     gtk_list_store_set(list_store, &iter, 0, "", 1, "(корневой уровень)", -1);
     
-    void add_items_recursive(MenuItem *item, const char *path) {
-        char item_path[MAX_PATH_LEN];
-        snprintf(item_path, sizeof(item_path), "%s%s%s", 
-                 path ? path : "", path ? "/" : "", item->name);
-        
-        if (item->is_category) {
-            gtk_list_store_append(list_store, &iter);
-            gtk_list_store_set(list_store, &iter, 0, item_path, 1, item->name, -1);
-            
-            for (int i = 0; i < item->child_count; i++) {
-                add_items_recursive(item->children[i], item_path);
-            }
-        }
-    }
-    
     for (int i = 0; i < app->root->child_count; i++) {
-        add_items_recursive(app->root->children[i], NULL);
+        add_items_recursive(list_store, NULL, app->root->children[i], NULL);
     }
     
     gtk_combo_box_set_model(GTK_COMBO_BOX(app->parent_combo), GTK_TREE_MODEL(list_store));
@@ -276,6 +278,7 @@ static void update_parent_combo(AppData *app) {
 }
 
 static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
     AppData *app = (AppData *)user_data;
     
     const char *name = gtk_entry_get_text(GTK_ENTRY(app->name_entry));
@@ -326,16 +329,18 @@ static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
     g_free(parent_path);
 }
 
-static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
-    AppData *app = (AppData *)user_data;
-    
-    void free_items_recursive(MenuItem *item) {
-        for (int i = 0; i < item->child_count; i++) {
-            free_items_recursive(item->children[i]);
-        }
-        g_free(item->children);
-        g_free(item);
+static void free_items_recursive(MenuItem *item) {
+    for (int i = 0; i < item->child_count; i++) {
+        free_items_recursive(item->children[i]);
     }
+    g_free(item->children);
+    g_free(item);
+}
+
+static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+    (void)widget;
+    (void)event;
+    AppData *app = (AppData *)user_data;
     
     free_items_recursive(app->root);
     g_object_unref(app->css_provider);
@@ -345,6 +350,8 @@ static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer us
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
+    (void)app;
+    (void)user_data;
     AppData *data = g_new0(AppData, 1);
     data->root = menu_item_create("Меню", 0.0, TRUE);
     load_default_menu(data->root);
