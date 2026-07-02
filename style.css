@@ -1,0 +1,1182 @@
+* {
+    background-color: #f5f5f5;
+    color: #333333;
+}
+
+.window {
+    background-color: #ffffff;
+}
+
+.header {
+    background-color: #ffffff;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 10px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.info-label {
+    font-size: 18px;
+    color: #555555;
+    padding: 10px;
+}
+
+button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 80px;
+}
+
+button:hover {
+    background-color: #357abd;
+}
+
+button:active {
+    background-color: #2c6ca0;
+}
+
+entry {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+frame {
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+treeview {
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 16px;
+}
+
+treeview:selected {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+
+treeview:selected:focus {
+    background-color: #357abd;
+    color: #ffffff;
+}
+
+treeview:hover {
+    background-color: #e3f2fd;
+}
+
+treeview row {
+    padding: 8px;
+    min-height: 40px;
+}
+
+treeview header {
+    background-color: #4a90e2;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px;
+}
+
+treeview header:active {
+    background-color: #357abd;
+}
+
+treeview header:focus {
+    background-color: #357abd;
+}
+
+treeview separator {
+    background-color: #e0e0e0;
+}
+
+treeview cell {
+    padding: 5px 10px;
+}
+
+treeview check {
+    background-color: #ffffff;
+}
+
+treeview check:checked {
+    background-color: #4a90e2;
+}
+
+treeview progress {
+    background-color: #4a90e2;
+}
+
+treeview entry {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+}
+
+treeview entry:focus {
+    border-color: #357abd;
+}
+
+treeview spinbutton {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+}
+
+treeview spinbutton:focus {
+    border-color: #357abd;
+}
+
+treeview combobox {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+treeview combobox:focus {
+    border-color: #357abd;
+}
+
+treeview toolbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+treeview toolbar button {
+    background-color: transparent;
+    border: none;
+    min-height: 30px;
+    padding: 5px 10px;
+}
+
+treeview toolbar button:hover {
+    background-color: #e3f2fd;
+}
+
+treeview toolbar button:active {
+    background-color: #bbdefb;
+}
+
+treeview menubar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+treeview menubar menuitem {
+    padding: 8px 15px;
+    background-color: transparent;
+}
+
+treeview menubar menuitem:hover {
+    background-color: #e3f2fd;
+}
+
+treeview menuitem {
+    padding: 8px 15px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+treeview menuitem:hover {
+    background-color: #e3f2fd;
+}
+
+treeview menuitem:active {
+    background-color: #bbdefb;
+}
+
+treeview menuitem:checked {
+    background-color: #bbdefb;
+}
+
+treeview menuitem check {
+    background-color: transparent;
+}
+
+treeview menuitem check:checked {
+    background-color: #4a90e2;
+}
+
+treeview menuitem radio {
+    background-color: transparent;
+}
+
+treeview menuitem radio:checked {
+    background-color: #4a90e2;
+}
+
+treeview menuitem separator {
+    background-color: #e0e0e0;
+}
+
+treeview menuitem accelerator {
+    color: #888888;
+}
+
+treeview menuitem image {
+    padding-right: 10px;
+}
+
+treeview menuitem title {
+    font-weight: bold;
+}
+
+treeview menuitem subtitle {
+    font-size: smaller;
+    color: #888888;
+}
+
+treeview menuitem arrow {
+    color: #888888;
+}
+
+treeview menu {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview popup {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview tooltip {
+    background-color: #333333;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+treeview statusbar {
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    padding: 5px;
+}
+
+treeview notebook {
+    background-color: #ffffff;
+    border: none;
+}
+
+treeview notebook header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+treeview notebook tab {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    padding: 8px 15px;
+    margin-right: 2px;
+}
+
+treeview notebook tab:hover {
+    background-color: #e3f2fd;
+}
+
+treeview notebook tab:checked {
+    background-color: #ffffff;
+    border-bottom: 2px solid #4a90e2;
+    margin-bottom: -1px;
+}
+
+treeview notebook tab:checked:hover {
+    background-color: #ffffff;
+}
+
+treeview notebook tab close {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 5px;
+}
+
+treeview notebook tab close:hover {
+    background-color: #ffcccc;
+    color: #cc0000;
+    border-radius: 3px;
+}
+
+treeview notebook stack {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 5px 5px 5px;
+}
+
+treeview notebook stack page {
+    padding: 15px;
+}
+
+treeview scrollbar {
+    background-color: #f5f5f5;
+}
+
+treeview scrollbar slider {
+    background-color: #cccccc;
+    border-radius: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    margin: 2px;
+}
+
+treeview scrollbar slider:hover {
+    background-color: #999999;
+}
+
+treeview scrollbar slider:active {
+    background-color: #666666;
+}
+
+treeview scrollbar trough {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+}
+
+treeview scrollbar button {
+    background-color: #cccccc;
+    border: none;
+    border-radius: 5px;
+    min-width: 15px;
+    min-height: 15px;
+    padding: 2px;
+}
+
+treeview scrollbar button:hover {
+    background-color: #999999;
+}
+
+treeview scrollbar button:active {
+    background-color: #666666;
+}
+
+treeview scale {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+treeview scale trough {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    min-height: 10px;
+    min-width: 10px;
+}
+
+treeview scale trough highlight {
+    background-color: #4a90e2;
+    border-radius: 10px;
+}
+
+treeview scale slider {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 50%;
+    min-width: 20px;
+    min-height: 20px;
+}
+
+treeview scale slider:hover {
+    background-color: #e3f2fd;
+    border-color: #357abd;
+}
+
+treeview scale slider:active {
+    background-color: #bbdefb;
+    border-color: #2c6ca0;
+}
+
+treeview switch {
+    background-color: #cccccc;
+    border-radius: 20px;
+    min-width: 60px;
+    min-height: 30px;
+    border: none;
+}
+
+treeview switch slider {
+    background-color: #ffffff;
+    border-radius: 50%;
+    min-width: 26px;
+    min-height: 26px;
+    border: 2px solid #cccccc;
+    margin: 2px;
+}
+
+treeview switch:checked {
+    background-color: #4a90e2;
+}
+
+treeview switch:checked slider {
+    border-color: #357abd;
+    margin-left: 32px;
+}
+
+treeview switch slider:hover {
+    background-color: #e3f2fd;
+    border-color: #357abd;
+}
+
+treeview progressbar {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    min-height: 20px;
+    border: none;
+}
+
+treeview progressbar progress {
+    background-color: #4a90e2;
+    border-radius: 10px;
+}
+
+treeview spinner {
+    background-color: transparent;
+    color: #4a90e2;
+}
+
+treeview levelbar {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    min-height: 20px;
+    border: none;
+}
+
+treeview levelbar block {
+    background-color: #4a90e2;
+    border-radius: 10px;
+    margin: 2px;
+}
+
+treeview levelbar block:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+treeview levelbar block:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+treeview infobar {
+    background-color: #e3f2fd;
+    border: 1px solid #4a90e2;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview infobar:hover {
+    background-color: #bbdefb;
+}
+
+treeview infobar:active {
+    background-color: #90caf9;
+}
+
+treeview actionbar {
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    padding: 5px;
+}
+
+treeview actionbar button {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    min-height: 36px;
+}
+
+treeview actionbar button:hover {
+    background-color: #357abd;
+}
+
+treeview actionbar button:active {
+    background-color: #2c6ca0;
+}
+
+treeview searchbar {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview searchbar entry {
+    background-color: #ffffff;
+    border: none;
+    padding: 5px;
+}
+
+treeview searchbar button {
+    background-color: transparent;
+    border: none;
+    min-height: 30px;
+    padding: 5px 10px;
+}
+
+treeview searchbar button:hover {
+    background-color: #e3f2fd;
+}
+
+treeview searchbar button:active {
+    background-color: #bbdefb;
+}
+
+treeview revealer {
+    background-color: transparent;
+}
+
+treeview revealer child {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview header bar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+}
+
+treeview header bar title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+treeview header bar subtitle {
+    font-size: 14px;
+    color: #888888;
+}
+
+treeview header bar button {
+    background-color: transparent;
+    border: none;
+    min-height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+}
+
+treeview header bar button:hover {
+    background-color: #e3f2fd;
+}
+
+treeview header bar button:active {
+    background-color: #bbdefb;
+}
+
+treeview header bar button.close {
+    background-color: #ff6b6b;
+    color: #ffffff;
+}
+
+treeview header bar button.close:hover {
+    background-color: #ff5252;
+}
+
+treeview header bar button.close:active {
+    background-color: #ff1744;
+}
+
+treeview header bar view-switcher {
+    background-color: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+treeview header bar view-switcher button {
+    background-color: transparent;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    min-height: 30px;
+}
+
+treeview header bar view-switcher button:hover {
+    background-color: #e3f2fd;
+}
+
+treeview header bar view-switcher button:checked {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+
+treeview header bar view-switcher button:checked:hover {
+    background-color: #357abd;
+}
+
+treeview header bar view-switcher button:active {
+    background-color: #2c6ca0;
+}
+
+treeview scrolledwindow {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+treeview scrolledwindow viewport {
+    background-color: #ffffff;
+}
+
+treeview viewport {
+    background-color: #ffffff;
+}
+
+treeview viewport frame {
+    background-color: #ffffff;
+    border: none;
+}
+
+treeview viewport button {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    min-height: 36px;
+}
+
+treeview viewport button:hover {
+    background-color: #357abd;
+}
+
+treeview viewport button:active {
+    background-color: #2c6ca0;
+}
+
+treeview viewport entry {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+treeview viewport entry:focus {
+    border-color: #357abd;
+}
+
+treeview viewport spinbutton {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview viewport spinbutton:focus {
+    border-color: #357abd;
+}
+
+treeview viewport combobox {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview viewport combobox:focus {
+    border-color: #357abd;
+}
+
+treeview viewport textview {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+treeview viewport textview text {
+    background-color: #ffffff;
+    padding: 5px;
+}
+
+treeview viewport textview text selection {
+    background-color: #bbdefb;
+    color: #333333;
+}
+
+treeview viewport textview text:selected {
+    background-color: #bbdefb;
+    color: #333333;
+}
+
+treeview viewport textview text:inserted {
+    background-color: #e3f2fd;
+}
+
+treeview viewport textview text:deleted {
+    background-color: #ffcccc;
+    color: #cc0000;
+}
+
+treeview viewport textview text:edited {
+    background-color: #fff9c4;
+}
+
+treeview viewport textview text:search-match {
+    background-color: #ffeb3b;
+    color: #333333;
+}
+
+treeview viewport textview text:misspelled {
+    underline-color: #ff0000;
+    underline: #ff0000;
+}
+
+treeview viewport textview text:link {
+    color: #4a90e2;
+    text-decoration: underline;
+}
+
+treeview viewport textview text:visited-link {
+    color: #357abd;
+    text-decoration: underline;
+}
+
+treeview viewport iconview {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+treeview viewport iconview item {
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview viewport iconview item:hover {
+    background-color: #e3f2fd;
+    border-color: #4a90e2;
+}
+
+treeview viewport iconview item:selected {
+    background-color: #bbdefb;
+    border-color: #4a90e2;
+}
+
+treeview viewport iconview item:active {
+    background-color: #90caf9;
+    border-color: #357abd;
+}
+
+treeview viewport iconview item:focus {
+    background-color: #bbdefb;
+    border-color: #4a90e2;
+}
+
+treeview viewport iconview rubberband {
+    background-color: rgba(74, 144, 226, 0.2);
+    border: 1px solid #4a90e2;
+    border-radius: 5px;
+}
+
+treeview viewport cell {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview viewport cell:hover {
+    background-color: #e3f2fd;
+    border-color: #357abd;
+}
+
+treeview viewport cell:selected {
+    background-color: #bbdefb;
+    border-color: #4a90e2;
+}
+
+treeview viewport cell:active {
+    background-color: #90caf9;
+    border-color: #357abd;
+}
+
+treeview viewport cell:focus {
+    background-color: #bbdefb;
+    border-color: #4a90e2;
+}
+
+treeview viewport layout {
+    background-color: #ffffff;
+}
+
+treeview viewport overlay {
+    background-color: transparent;
+}
+
+treeview viewport overlay widget {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview viewport overlay widget:hover {
+    background-color: #e3f2fd;
+}
+
+treeview viewport overlay widget:active {
+    background-color: #bbdefb;
+}
+
+treeview viewport popover {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+treeview viewport popover arrow {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+treeview viewport popover :hover {
+    background-color: #e3f2fd;
+}
+
+treeview viewport popover :active {
+    background-color: #bbdefb;
+}
+
+treeview viewport popover button {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+}
+
+treeview viewport popover button:hover {
+    background-color: #357abd;
+}
+
+treeview viewport popover entry {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+treeview viewport popover entry:focus {
+    border-color: #357abd;
+}
+
+treeview viewport popover combobox {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview viewport popover combobox:focus {
+    border-color: #357abd;
+}
+
+treeview viewport popover spinbutton {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+treeview viewport popover spinbutton:focus {
+    border-color: #357abd;
+}
+
+treeview viewport calendar {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+treeview viewport calendar header {
+    background-color: #4a90e2;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px;
+    font-weight: bold;
+}
+
+treeview viewport calendar button {
+    background-color: transparent;
+    border: none;
+    color: #333333;
+    padding: 5px;
+    min-height: 30px;
+    border-radius: 3px;
+}
+
+treeview viewport calendar button:hover {
+    background-color: #e3f2fd;
+}
+
+treeview viewport calendar button:active {
+    background-color: #bbdefb;
+}
+
+treeview viewport calendar day {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 5px;
+}
+
+treeview viewport calendar day:hover {
+    background-color: #e3f2fd;
+    border-color: #4a90e2;
+}
+
+treeview viewport calendar day:selected {
+    background-color: #4a90e2;
+    color: #ffffff;
+    border-color: #357abd;
+}
+
+treeview viewport calendar day:active {
+    background-color: #2c6ca0;
+}
+
+treeview viewport calendar day:focus {
+    background-color: #bbdefb;
+    border-color: #4a90e2;
+}
+
+treeview viewport calendar day.other-month {
+    color: #888888;
+}
+
+treeview viewport calendar day.today {
+    border: 2px solid #4a90e2;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.weekend {
+    color: #cc0000;
+}
+
+treeview viewport calendar day.special {
+    background-color: #fff9c4;
+}
+
+treeview viewport calendar day.holiday {
+    background-color: #ffebee;
+    color: #cc0000;
+}
+
+treeview viewport calendar day.birthday {
+    background-color: #fce4ec;
+    color: #cc0000;
+}
+
+treeview viewport calendar day.event {
+    background-color: #e3f2fd;
+    color: #4a90e2;
+}
+
+treeview viewport calendar day.appointment {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+treeview viewport calendar day.meeting {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+treeview viewport calendar day.reminder {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+treeview viewport calendar day.task {
+    background-color: #e0f2f1;
+    color: #00695c;
+}
+
+treeview viewport calendar day.note {
+    background-color: #fff9c4;
+    color: #f57f17;
+}
+
+treeview viewport calendar day.important {
+    background-color: #ffebee;
+    color: #c62828;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.urgent {
+    background-color: #ff5722;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.deadline {
+    background-color: #d32f2f;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.expired {
+    background-color: #b71c1c;
+    color: #ffffff;
+    text-decoration: line-through;
+}
+
+treeview viewport calendar day.completed {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+treeview viewport calendar day.cancelled {
+    background-color: #e0e0e0;
+    color: #757575;
+    text-decoration: line-through;
+}
+
+treeview viewport calendar day.postponed {
+    background-color: #fff9c4;
+    color: #f57f17;
+    font-style: italic;
+}
+
+treeview viewport calendar day.rescheduled {
+    background-color: #ffe0b2;
+    color: #e65100;
+    font-style: italic;
+}
+
+treeview viewport calendar day.recurring {
+    background-color: #e1bee7;
+    color: #7b1fa2;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-daily {
+    background-color: #e1bee7;
+    color: #7b1fa2;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-weekly {
+    background-color: #d1c4e9;
+    color: #512da8;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-monthly {
+    background-color: #c5cae9;
+    color: #303f9f;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-yearly {
+    background-color: #bbdefb;
+    color: #1976d2;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-weekdays {
+    background-color: #b3e5fc;
+    color: #0288d1;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-weekends {
+    background-color: #b2ebf2;
+    color: #0097a7;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-custom {
+    background-color: #80deea;
+    color: #006064;
+    font-weight: bold;
+}
+
+treeview viewport calendar day.recurring-exception {
+    background-color: #ffccbc;
+    color: #d84315;
+    font-style: italic;
+}
+
+treeview viewport calendar day.recurring-modified {
+    background-color: #ffecb3;
+    color: #ff8f00;
+    font-style: italic;
+}
+
+treeview viewport calendar day.recurring-deleted {
+    background-color: #ffcdd2;
+    color: #c62828;
+    text-decoration: line-through;
+}
+
+combobox {
+    background-color: #ffffff;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 16px;
+}
+
+combobox button {
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    padding: 5px 10px;
+    min-height: 30px;
+}
+
+combobox button:hover {
+    background-color: #357abd;
+}
+
+combobox button:active {
+    background-color: #2c6ca0;
+}
+
+combobox arrow {
+    color: #ffffff;
+}
+
+combobox cell {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 8px;
+}
+
+combobox cell:hover {
+    background-color: #e3f2fd;
+}
+
+combobox cell:selected {
+    background-color: #4a90e2;
+    color: #ffffff;
+}
+
+combobox cell:active {
+    background-color: #2c6ca0;
+    color: #ffffff;
+}
