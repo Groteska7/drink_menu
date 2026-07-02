@@ -9,41 +9,41 @@
 
 .header {
     background-color: #ffffff;
-    border-bottom: 3px solid #e0e0e0;
-    padding: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 10px;
 }
 
 .title {
-    font-size: 56px;
+    font-size: 28px;
     font-weight: bold;
     color: #2c3e50;
 }
 
 .info-label {
-    font-size: 36px;
+    font-size: 18px;
     color: #555555;
-    padding: 20px;
+    padding: 10px;
 }
 
 .total-label {
-    font-size: 48px;
+    font-size: 24px;
     font-weight: bold;
     color: #2c3e50;
-    padding: 30px;
+    padding: 15px;
     background-color: #e3f2fd;
-    border: 3px solid #4a90e2;
-    border-radius: 15px;
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
 }
 
 .add-to-cart-button {
     background-color: #27ae60;
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 30px;
-    font-size: 36px;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
     font-weight: bold;
-    min-height: 120px;
+    min-height: 50px;
 }
 
 .add-to-cart-button:hover {
@@ -58,11 +58,11 @@
     background-color: #27ae60;
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 40px;
-    font-size: 40px;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 20px;
     font-weight: bold;
-    min-height: 140px;
+    min-height: 60px;
 }
 
 .checkout-button:hover {
@@ -77,11 +77,11 @@
     background-color: #e74c3c;
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 24px;
-    font-size: 32px;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 14px;
     font-weight: bold;
-    min-height: 100px;
+    min-height: 40px;
 }
 
 .remove-button:hover {
@@ -93,35 +93,46 @@
 }
 
 .cart-frame {
-    border: 3px solid #4a90e2;
-    border-radius: 15px;
-    padding: 20px;
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
+    padding: 10px;
     background-color: #ffffff;
 }
 
 .menu-frame {
-    border: 3px solid #4a90e2;
-    border-radius: 15px;
-    padding: 20px;
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
+    padding: 10px;
     background-color: #ffffff;
 }
 
 .add-frame {
-    border: 3px solid #4a90e2;
-    border-radius: 15px;
-    padding: 20px;
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
+    padding: 10px;
     background-color: #ffffff;
+}
+
+.action-button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    min-height: 40px;
 }
 
 button {
     background-color: #4a90e2;
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 30px;
-    font-size: 36px;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
     font-weight: bold;
-    min-height: 160px;
+    min-height: 50px;
 }
 
 button:hover {
@@ -134,23 +145,23 @@ button:active {
 
 entry {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
-    border-radius: 12px;
-    padding: 24px;
-    font-size: 32px;
+    border: 2px solid #4a90e2;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 16px;
 }
 
 frame {
-    border: 3px solid #4a90e2;
-    border-radius: 15px;
-    padding: 20px;
+    border: 2px solid #4a90e2;
+    border-radius: 10px;
+    padding: 10px;
     background-color: #ffffff;
 }
 
 treeview {
     background-color: #ffffff;
     color: #333333;
-    font-size: 32px;
+    font-size: 18px;
 }
 
 treeview:selected {
@@ -168,16 +179,16 @@ treeview:hover {
 }
 
 treeview row {
-    padding: 12px;
-    min-height: 80px;
+    padding: 6px;
+    min-height: 40px;
 }
 
 treeview header {
     background-color: #4a90e2;
     color: #ffffff;
     font-weight: bold;
-    padding: 20px;
-    font-size: 36px;
+    padding: 8px;
+    font-size: 18px;
 }
 
 treeview header:active {
@@ -193,7 +204,7 @@ treeview separator {
 }
 
 treeview cell {
-    padding: 10px 20px;
+    padding: 4px 8px;
 }
 
 treeview check {
@@ -210,7 +221,7 @@ treeview progress {
 
 treeview entry {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
+    border: 2px solid #4a90e2;
 }
 
 treeview entry:focus {
@@ -219,7 +230,7 @@ treeview entry:focus {
 
 treeview spinbutton {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
+    border: 2px solid #4a90e2;
 }
 
 treeview spinbutton:focus {
@@ -228,10 +239,10 @@ treeview spinbutton:focus {
 
 treeview combobox {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 32px;
+    border: 2px solid #4a90e2;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 16px;
 }
 
 treeview combobox:focus {
@@ -240,14 +251,14 @@ treeview combobox:focus {
 
 treeview toolbar {
     background-color: #ffffff;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 treeview toolbar button {
     background-color: transparent;
     border: none;
-    min-height: 60px;
-    padding: 10px 20px;
+    min-height: 40px;
+    padding: 6px 12px;
 }
 
 treeview toolbar button:hover {
@@ -260,13 +271,12 @@ treeview toolbar button:active {
 
 treeview menubar {
     background-color: #ffffff;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 treeview menubar menuitem {
-    padding: 16px 30px;
+    padding: 8px 16px;
     background-color: transparent;
-    font-size: 32px;
 }
 
 treeview menubar menuitem:hover {
@@ -274,10 +284,9 @@ treeview menubar menuitem:hover {
 }
 
 treeview menuitem {
-    padding: 16px 30px;
+    padding: 8px 16px;
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    font-size: 32px;
+    border: 1px solid #e0e0e0;
 }
 
 treeview menuitem:hover {
@@ -294,30 +303,30 @@ treeview menuitem:checked {
 
 treeview menu {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 treeview popup {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 treeview tooltip {
     background-color: #333333;
     color: #ffffff;
-    border-radius: 10px;
-    padding: 16px;
-    font-size: 28px;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
 }
 
 treeview statusbar {
     background-color: #ffffff;
-    border-top: 2px solid #e0e0e0;
-    padding: 10px;
+    border-top: 1px solid #e0e0e0;
+    padding: 5px;
 }
 
 treeview notebook {
@@ -327,17 +336,17 @@ treeview notebook {
 
 treeview notebook header {
     background-color: #f5f5f5;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 treeview notebook tab {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #e0e0e0;
     border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    padding: 20px 30px;
-    margin-right: 4px;
-    font-size: 36px;
+    border-radius: 5px 5px 0 0;
+    padding: 10px 20px;
+    margin-right: 2px;
+    font-size: 18px;
     font-weight: bold;
 }
 
@@ -347,7 +356,7 @@ treeview notebook tab:hover {
 
 treeview notebook tab:checked {
     background-color: #ffffff;
-    border-bottom: 3px solid #4a90e2;
+    border-bottom: 2px solid #4a90e2;
     margin-bottom: -1px;
 }
 
@@ -359,23 +368,23 @@ treeview notebook tab close {
     background-color: transparent;
     border: none;
     padding: 0;
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
 treeview notebook tab close:hover {
     background-color: #ffcccc;
     color: #cc0000;
-    border-radius: 5px;
+    border-radius: 3px;
 }
 
 treeview notebook stack {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 0 10px 10px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 5px 5px 5px;
 }
 
 treeview notebook stack page {
-    padding: 30px;
+    padding: 15px;
 }
 
 treeview scrollbar {
@@ -384,10 +393,10 @@ treeview scrollbar {
 
 treeview scrollbar slider {
     background-color: #cccccc;
-    border-radius: 15px;
-    min-width: 20px;
-    min-height: 20px;
-    margin: 4px;
+    border-radius: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    margin: 2px;
 }
 
 treeview scrollbar slider:hover {
@@ -400,16 +409,16 @@ treeview scrollbar slider:active {
 
 treeview scrollbar trough {
     background-color: #e0e0e0;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 treeview scrollbar button {
     background-color: #cccccc;
     border: none;
-    border-radius: 10px;
-    min-width: 30px;
-    min-height: 30px;
-    padding: 4px;
+    border-radius: 5px;
+    min-width: 15px;
+    min-height: 15px;
+    padding: 2px;
 }
 
 treeview scrollbar button:hover {
@@ -422,18 +431,18 @@ treeview scrollbar button:active {
 
 combobox {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 32px;
+    border: 2px solid #4a90e2;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 16px;
 }
 
 combobox button {
     background-color: #4a90e2;
     border: none;
-    border-radius: 0 10px 10px 0;
-    padding: 10px 20px;
-    min-height: 60px;
+    border-radius: 0 6px 6px 0;
+    padding: 6px 12px;
+    min-height: 30px;
 }
 
 combobox button:hover {
@@ -451,8 +460,7 @@ combobox arrow {
 combobox cell {
     background-color: #ffffff;
     color: #333333;
-    padding: 16px;
-    font-size: 32px;
+    padding: 8px;
 }
 
 combobox cell:hover {
@@ -476,18 +484,18 @@ notebook {
 
 notebook header {
     background-color: #f5f5f5;
-    border-bottom: 2px solid #e0e0e0;
-    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 5px;
 }
 
 notebook tab {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #e0e0e0;
     border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    padding: 20px 30px;
-    margin-right: 4px;
-    font-size: 36px;
+    border-radius: 5px 5px 0 0;
+    padding: 10px 20px;
+    margin-right: 2px;
+    font-size: 18px;
     font-weight: bold;
 }
 
@@ -497,7 +505,7 @@ notebook tab:hover {
 
 notebook tab:checked {
     background-color: #ffffff;
-    border-bottom: 3px solid #4a90e2;
+    border-bottom: 2px solid #4a90e2;
     margin-bottom: -1px;
 }
 
@@ -507,10 +515,16 @@ notebook tab:checked:hover {
 
 notebook stack {
     background-color: #ffffff;
-    border: 2px solid #e0e0e0;
-    border-radius: 0 10px 10px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 5px 5px 5px;
 }
 
 notebook stack page {
-    padding: 30px;
+    padding: 15px;
+}
+
+notebook header tab {
+    border-radius: 5px 5px 0 0;
+    padding: 8px 16px;
+    font-size: 16px;
 }

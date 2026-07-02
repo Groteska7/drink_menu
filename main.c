@@ -45,7 +45,6 @@ typedef struct {
     GtkWidget *total_label;
     GtkCssProvider *css_provider;
     Cart *cart;
-    int edit_mode;
 } AppData;
 
 static MenuItem* menu_item_create(const char *name, double price, int is_category) {
@@ -426,7 +425,9 @@ static void populate_tree_store(GtkTreeStore *store, MenuItem *item,
 
 static void refresh_tree_view(AppData *app) {
     GtkTreeStore *store = create_tree_store();
-    populate_tree_store(store, app->root, NULL, NULL);
+    for (int i = 0; i < app->root->child_count; i++) {
+        populate_tree_store(store, app->root->children[i], NULL, NULL);
+    }
     gtk_tree_view_set_model(GTK_TREE_VIEW(app->menu_tree_view), GTK_TREE_MODEL(store));
     g_object_unref(store);
 }
@@ -619,9 +620,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     (void)app;
     (void)user_data;
     AppData *data = g_new0(AppData, 1);
-    data->root = menu_item_create("Меню", 0.0, TRUE);
+    data->root = menu_item_create("", 0.0, TRUE);
     data->cart = cart_create();
-    data->edit_mode = FALSE;
     load_default_menu(data->root);
     
     GtkWidget *window = gtk_application_window_new(app);
@@ -631,10 +631,10 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     load_css(data);
     
-    GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+    GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(window), main_vbox);
     
-    GtkWidget *header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    GtkWidget *header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_style_context_add_class(gtk_widget_get_style_context(header), "header");
     gtk_box_pack_start(GTK_BOX(main_vbox), header, FALSE, FALSE, 0);
     
@@ -642,19 +642,16 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_style_context_add_class(gtk_widget_get_style_context(title), "title");
     gtk_box_pack_start(GTK_BOX(header), title, TRUE, TRUE, 0);
     
-    GtkWidget *edit_button = gtk_toggle_button_new_with_label("Редактировать меню");
-    gtk_box_pack_start(GTK_BOX(header), edit_button, FALSE, FALSE, 0);
-    g_signal_connect(edit_button, "toggled", G_CALLBACK(gtk_toggle_button_get_active), data);
-    
     GtkWidget *fullscreen_button = gtk_toggle_button_new_with_label("Полный экран");
+    gtk_style_context_add_class(gtk_widget_get_style_context(fullscreen_button), "action-button");
     gtk_box_pack_end(GTK_BOX(header), fullscreen_button, FALSE, FALSE, 0);
-    g_signal_connect(fullscreen_button, "toggled", G_CALLBACK(gtk_window_fullscreen), window);
+    g_signal_connect_swapped(fullscreen_button, "toggled", G_CALLBACK(gtk_window_fullscreen), window);
     
     data->notebook = gtk_notebook_new();
     gtk_box_pack_start(GTK_BOX(main_vbox), data->notebook, TRUE, TRUE, 0);
     
-    GtkWidget *menu_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
-    gtk_container_set_border_width(GTK_CONTAINER(menu_tab), 15);
+    GtkWidget *menu_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(menu_tab), 10);
     
     GtkWidget *menu_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(menu_scroll), 
@@ -663,7 +660,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     data->menu_tree_view = gtk_tree_view_new();
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->menu_tree_view), TRUE);
-    gtk_widget_set_size_request(data->menu_tree_view, 800, 600);
     
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
     GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes(
@@ -693,8 +689,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_start(GTK_BOX(menu_tab), add_to_cart_button, FALSE, FALSE, 0);
     g_signal_connect(add_to_cart_button, "clicked", G_CALLBACK(on_add_to_cart_clicked), data);
     
-    GtkWidget *cart_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
-    gtk_container_set_border_width(GTK_CONTAINER(cart_tab), 15);
+    GtkWidget *cart_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(cart_tab), 10);
     
     GtkWidget *cart_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(cart_scroll), 
@@ -703,7 +699,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     data->cart_tree_view = gtk_tree_view_new();
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->cart_tree_view), TRUE);
-    gtk_widget_set_size_request(data->cart_tree_view, 800, 600);
     
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(
@@ -722,7 +717,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     gtk_container_add(GTK_CONTAINER(cart_scroll), data->cart_tree_view);
     
-    GtkWidget *cart_buttons_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    GtkWidget *cart_buttons_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(cart_tab), cart_buttons_hbox, FALSE, FALSE, 0);
     
     GtkWidget *remove_button = gtk_button_new_with_label("Удалить выбранное");
@@ -742,19 +737,19 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_notebook_append_page(GTK_NOTEBOOK(data->notebook), menu_tab, gtk_label_new("Меню"));
     gtk_notebook_append_page(GTK_NOTEBOOK(data->notebook), cart_tab, gtk_label_new("Корзина"));
     
-    GtkWidget *edit_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
-    gtk_container_set_border_width(GTK_CONTAINER(edit_tab), 15);
+    GtkWidget *edit_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(edit_tab), 10);
     
     GtkWidget *add_frame = gtk_frame_new("Добавить / Редактировать элемент");
     gtk_style_context_add_class(gtk_widget_get_style_context(add_frame), "add-frame");
     gtk_box_pack_start(GTK_BOX(edit_tab), add_frame, FALSE, FALSE, 0);
     
-    GtkWidget *add_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    GtkWidget *add_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_container_add(GTK_CONTAINER(add_frame), add_box);
-    gtk_widget_set_margin_top(add_box, 15);
-    gtk_widget_set_margin_bottom(add_box, 15);
-    gtk_widget_set_margin_start(add_box, 15);
-    gtk_widget_set_margin_end(add_box, 15);
+    gtk_widget_set_margin_top(add_box, 10);
+    gtk_widget_set_margin_bottom(add_box, 10);
+    gtk_widget_set_margin_start(add_box, 10);
+    gtk_widget_set_margin_end(add_box, 10);
     
     data->name_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(data->name_entry), "Название");
