@@ -1,34 +1,80 @@
+roteska7@groteska7:~/labs/drink_menu$ make
 gcc -std=c11 -Wall -Wextra -pedantic `pkg-config --cflags gtk+-3.0` -c main.c -o main.o
 main.c: In function ‘on_row_activated’:
-main.c:180:14: warning: unused variable ‘app’ [-Wunused-variable]
-  180 |     AppData *app = (AppData *)user_data;
-      |              ^~~
-main.c:179:49: warning: unused parameter ‘column’ [-Wunused-parameter]
-  179 |                              GtkTreeViewColumn *column, gpointer user_data) {
-      |                              ~~~~~~~~~~~~~~~~~~~^~~~~~
-main.c: In function ‘update_parent_combo’:
-main.c:250:5: warning: ISO C forbids nested functions [-Wpedantic]
-  250 |     void add_items_recursive(MenuItem *item, const char *path) {
+main.c:208:1: warning: ISO C forbids nested functions [-Wpedantic]
+  208 | static GtkTreeStore* create_tree_store() {
+      | ^~~~~~
+main.c:208:22: error: invalid storage class for function ‘create_tree_store’
+  208 | static GtkTreeStore* create_tree_store() {
+      |                      ^~~~~~~~~~~~~~~~~
+main.c:213:1: warning: ISO C forbids nested functions [-Wpedantic]
+  213 | static void populate_tree_store(GtkTreeStore *store, MenuItem *item,
+      | ^~~~~~
+main.c:213:13: error: invalid storage class for function ‘populate_tree_store’
+  213 | static void populate_tree_store(GtkTreeStore *store, MenuItem *item,
+      |             ^~~~~~~~~~~~~~~~~~~
+main.c:236:1: warning: ISO C forbids nested functions [-Wpedantic]
+  236 | static void refresh_tree_view(AppData *app) {
+      | ^~~~~~
+main.c:236:13: error: invalid storage class for function ‘refresh_tree_view’
+  236 | static void refresh_tree_view(AppData *app) {
+      |             ^~~~~~~~~~~~~~~~~
+main.c:243:1: warning: ISO C forbids nested functions [-Wpedantic]
+  243 | static void add_items_recursive(GtkListStore *list_store, GtkTreeIter *parent_iter,
+      | ^~~~~~
+main.c:243:13: error: invalid storage class for function ‘add_items_recursive’
+  243 | static void add_items_recursive(GtkListStore *list_store, GtkTreeIter *parent_iter,
+      |             ^~~~~~~~~~~~~~~~~~~
+main.c: In function ‘add_items_recursive’:
+main.c:243:72: warning: unused parameter ‘parent_iter’ [-Wunused-parameter]
+  243 | static void add_items_recursive(GtkListStore *list_store, GtkTreeIter *parent_iter,
+      |                                                           ~~~~~~~~~~~~~^~~~~~~~~~~
+main.c: In function ‘on_row_activated’:
+main.c:260:1: warning: ISO C forbids nested functions [-Wpedantic]
+  260 | static void update_parent_combo(AppData *app) {
+      | ^~~~~~
+main.c:260:13: error: invalid storage class for function ‘update_parent_combo’
+  260 | static void update_parent_combo(AppData *app) {
+      |             ^~~~~~~~~~~~~~~~~~~
+main.c:280:1: warning: ISO C forbids nested functions [-Wpedantic]
+  280 | static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
+      | ^~~~~~
+main.c:280:13: error: invalid storage class for function ‘on_add_item_clicked’
+  280 | static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
+      |             ^~~~~~~~~~~~~~~~~~~
+main.c:332:1: warning: ISO C forbids nested functions [-Wpedantic]
+  332 | static void free_items_recursive(MenuItem *item) {
+      | ^~~~~~
+main.c:332:13: error: invalid storage class for function ‘free_items_recursive’
+  332 | static void free_items_recursive(MenuItem *item) {
+      |             ^~~~~~~~~~~~~~~~~~~~
+main.c:340:1: warning: ISO C forbids nested functions [-Wpedantic]
+  340 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+      | ^~~~~~
+main.c:340:17: error: invalid storage class for function ‘on_window_delete’
+  340 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+      |                 ^~~~~~~~~~~~~~~~
+main.c:352:1: warning: ISO C forbids nested functions [-Wpedantic]
+  352 | static void activate(GtkApplication *app, gpointer user_data) {
+      | ^~~~~~
+main.c:352:13: error: invalid storage class for function ‘activate’
+  352 | static void activate(GtkApplication *app, gpointer user_data) {
+      |             ^~~~~~~~
+main.c:443:1: warning: ISO C forbids nested functions [-Wpedantic]
+  443 | int main(int argc, char **argv) {
+      | ^~~
+main.c:443:5: warning: ‘main’ is normally a non-static function [-Wmain]
+  443 | int main(int argc, char **argv) {
       |     ^~~~
-main.c: In function ‘on_add_item_clicked’:
-main.c:278:44: warning: unused parameter ‘button’ [-Wunused-parameter]
-  278 | static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
-      |                                 ~~~~~~~~~~~^~~~~~
-main.c: In function ‘on_window_delete’:
-main.c:332:5: warning: ISO C forbids nested functions [-Wpedantic]
-  332 |     void free_items_recursive(MenuItem *item) {
+main.c:452:1: error: expected declaration or statement at end of input
+  452 | }
+      | ^
+main.c:180:66: warning: unused parameter ‘user_data’ [-Wunused-parameter]
+  180 |                              GtkTreeViewColumn *column, gpointer user_data) {
+      |                                                         ~~~~~~~~~^~~~~~~~~
+At top level:
+main.c:443:5: warning: ‘main’ defined but not used [-Wunused-function]
+  443 | int main(int argc, char **argv) {
       |     ^~~~
-main.c:329:45: warning: unused parameter ‘widget’ [-Wunused-parameter]
-  329 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
-      |                                  ~~~~~~~~~~~^~~~~~
-main.c:329:63: warning: unused parameter ‘event’ [-Wunused-parameter]
-  329 | static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
-      |                                                     ~~~~~~~~~~^~~~~
-main.c: In function ‘activate’:
-main.c:353:9: error: ‘AppData’ has no member named ‘window’
-  353 |     data->window = window;
-      |         ^~
-main.c:347:52: warning: unused parameter ‘user_data’ [-Wunused-parameter]
-  347 | static void activate(GtkApplication *app, gpointer user_data) {
-      |                                           ~~~~~~~~~^~~~~~~~~
 make: *** [Makefile:15: main.o] Ошибка 1
+groteska7@groteska7:~/labs/drink_menu$ 
