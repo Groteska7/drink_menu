@@ -4,10 +4,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAX_ITEMS 200
+#define MAX_ITEMS 500
 #define MAX_NAME_LEN 64
 #define MAX_PATH_LEN 256
 #define MAX_CART_ITEMS 50
+#define MAX_DEPTH 7
 
 typedef struct MenuItem {
     char name[MAX_NAME_LEN];
@@ -32,16 +33,19 @@ typedef struct {
 typedef struct {
     MenuItem *root;
     MenuItem *selected_item;
+    MenuItem *context_item;
     GtkWidget *window;
-    GtkWidget *tree_view;
+    GtkWidget *notebook;
+    GtkWidget *menu_tree_view;
+    GtkWidget *cart_tree_view;
     GtkWidget *info_label;
     GtkWidget *name_entry;
     GtkWidget *price_entry;
     GtkWidget *parent_combo;
-    GtkWidget *cart_tree_view;
     GtkWidget *total_label;
     GtkCssProvider *css_provider;
     Cart *cart;
+    int edit_mode;
 } AppData;
 
 static MenuItem* menu_item_create(const char *name, double price, int is_category) {
@@ -63,6 +67,15 @@ static void menu_item_add_child(MenuItem *parent, MenuItem *child) {
     }
     child->parent = parent;
     parent->children[parent->child_count++] = child;
+}
+
+static int get_depth(MenuItem *item) {
+    int depth = 0;
+    while (item->parent != NULL) {
+        depth++;
+        item = item->parent;
+    }
+    return depth;
 }
 
 static MenuItem* find_item_by_path(MenuItem *root, const char *path) {
@@ -218,7 +231,7 @@ static void on_tree_selection_changed(GtkTreeSelection *selection, gpointer user
         
         char info[512];
         if (is_category) {
-            snprintf(info, sizeof(info), "Категория: %s\nНажмите для просмотра подкатегорий", name);
+            snprintf(info, sizeof(info), "Категория: %s\nНажмите + для добавления подкатегории", name);
         } else {
             snprintf(info, sizeof(info), "Выбрано: %s\nЦена: %.2f руб.", name, price);
         }
@@ -273,7 +286,7 @@ static void on_add_to_cart_clicked(GtkButton *button, gpointer user_data) {
     (void)button;
     AppData *app = (AppData *)user_data;
     
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->tree_view));
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->menu_tree_view));
     GtkTreeModel *model;
     GtkTreeIter iter;
     
@@ -365,9 +378,6 @@ static void on_checkout_clicked(GtkButton *button, gpointer user_data) {
     gtk_window_set_title(GTK_WINDOW(dialog), "Оплата");
     
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        char total_str[64];
-        snprintf(total_str, sizeof(total_str), "%.2f", total);
-        
         gchar *command = g_strdup_printf("echo '%.2f' | xargs -0 printf 'Сумма: %%s руб.\\n'", total);
         int result = system(command);
         g_free(command);
@@ -376,7 +386,6 @@ static void on_checkout_clicked(GtkButton *button, gpointer user_data) {
             gtk_label_set_text(GTK_LABEL(app->info_label), "Заказ отправлен на оплату!");
             
             app->cart->count = 0;
-            double zero = 0.0;
             gtk_label_set_text(GTK_LABEL(app->total_label), "Итого: 0.00 руб.");
             gtk_tree_view_set_model(GTK_TREE_VIEW(app->cart_tree_view), NULL);
         } else {
@@ -418,7 +427,7 @@ static void populate_tree_store(GtkTreeStore *store, MenuItem *item,
 static void refresh_tree_view(AppData *app) {
     GtkTreeStore *store = create_tree_store();
     populate_tree_store(store, app->root, NULL, NULL);
-    gtk_tree_view_set_model(GTK_TREE_VIEW(app->tree_view), GTK_TREE_MODEL(store));
+    gtk_tree_view_set_model(GTK_TREE_VIEW(app->menu_tree_view), GTK_TREE_MODEL(store));
     g_object_unref(store);
 }
 
@@ -497,6 +506,13 @@ static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
         return;
     }
     
+    int depth = get_depth(parent);
+    if (depth >= MAX_DEPTH - 1) {
+        gtk_label_set_text(GTK_LABEL(app->info_label), "Ошибка: максимальная глубина вложенности!");
+        g_free(parent_path);
+        return;
+    }
+    
     MenuItem *new_item = menu_item_create(name, price, price == 0.0);
     menu_item_add_child(parent, new_item);
     
@@ -510,6 +526,40 @@ static void on_add_item_clicked(GtkButton *button, gpointer user_data) {
     update_parent_combo(app);
     
     g_free(parent_path);
+}
+
+static void on_add_category_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    AppData *app = (AppData *)user_data;
+    
+    if (!app->context_item || !app->context_item->is_category) {
+        gtk_label_set_text(GTK_LABEL(app->info_label), "Выберите категорию для добавления подкатегории!");
+        return;
+    }
+    
+    int depth = get_depth(app->context_item);
+    if (depth >= MAX_DEPTH - 1) {
+        gtk_label_set_text(GTK_LABEL(app->info_label), "Ошибка: максимальная глубина вложенности (7 уровней)!");
+        return;
+    }
+    
+    gtk_entry_set_text(GTK_ENTRY(app->name_entry), "");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(app->name_entry), "Новая категория (без цены)");
+    gtk_entry_set_text(GTK_ENTRY(app->price_entry), "0");
+    
+    char path[MAX_PATH_LEN];
+    snprintf(path, sizeof(path), "%s", app->context_item->name);
+    MenuItem *current = app->context_item;
+    while (current->parent != NULL && current->parent != app->root) {
+        char temp[MAX_PATH_LEN];
+        snprintf(temp, sizeof(temp), "%s/%s", current->parent->name, path);
+        strncpy(path, temp, sizeof(path));
+        current = current->parent;
+    }
+    
+    gtk_label_set_text(GTK_LABEL(app->info_label), "Введите название новой категории и нажмите 'Добавить'");
+    
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(app->notebook), 1);
 }
 
 static void free_items_recursive(MenuItem *item) {
@@ -533,91 +583,127 @@ static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer us
     return FALSE;
 }
 
+static void on_context_menu(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+    AppData *app = (AppData *)user_data;
+    
+    GtkTreePath *path;
+    if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(app->menu_tree_view),
+                                      event->button.x, event->button.y,
+                                      &path, NULL, NULL, NULL)) {
+        GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(app->menu_tree_view));
+        GtkTreeIter iter;
+        
+        if (gtk_tree_model_get_iter(model, &iter, path)) {
+            gchar *path_str;
+            gtk_tree_model_get(model, &iter, 3, &path_str, -1);
+            
+            app->context_item = find_item_by_path(app->root, path_str);
+            g_free(path_str);
+            
+            gtk_tree_path_free(path);
+            
+            on_add_category_clicked(NULL, app);
+        }
+    }
+}
+
+static gboolean on_tree_view_button_press(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
+    if (event->type == GDK_BUTTON_PRESS && event->button.button == 3) {
+        on_context_menu(widget, event, user_data);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
     (void)app;
     (void)user_data;
     AppData *data = g_new0(AppData, 1);
     data->root = menu_item_create("Меню", 0.0, TRUE);
     data->cart = cart_create();
+    data->edit_mode = FALSE;
     load_default_menu(data->root);
     
     GtkWidget *window = gtk_application_window_new(app);
     data->window = window;
-    gtk_window_set_title(GTK_WINDOW(window), "Кафе - Иерархическое меню");
-    gtk_window_set_default_size(GTK_WINDOW(window), 1400, 900);
+    gtk_window_set_title(GTK_WINDOW(window), "Кафе - Система управления");
+    gtk_window_set_default_size(GTK_WINDOW(window), 1600, 1200);
     
     load_css(data);
     
-    GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
     gtk_container_add(GTK_CONTAINER(window), main_vbox);
     
-    GtkWidget *header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
     gtk_style_context_add_class(gtk_widget_get_style_context(header), "header");
     gtk_box_pack_start(GTK_BOX(main_vbox), header, FALSE, FALSE, 0);
     
-    GtkWidget *title = gtk_label_new("Иерархическое меню напитков");
+    GtkWidget *title = gtk_label_new("Система управления кафе");
     gtk_style_context_add_class(gtk_widget_get_style_context(title), "title");
     gtk_box_pack_start(GTK_BOX(header), title, TRUE, TRUE, 0);
+    
+    GtkWidget *edit_button = gtk_toggle_button_new_with_label("Редактировать меню");
+    gtk_box_pack_start(GTK_BOX(header), edit_button, FALSE, FALSE, 0);
+    g_signal_connect(edit_button, "toggled", G_CALLBACK(gtk_toggle_button_get_active), data);
     
     GtkWidget *fullscreen_button = gtk_toggle_button_new_with_label("Полный экран");
     gtk_box_pack_end(GTK_BOX(header), fullscreen_button, FALSE, FALSE, 0);
     g_signal_connect(fullscreen_button, "toggled", G_CALLBACK(gtk_window_fullscreen), window);
     
-    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_pack_start(GTK_BOX(main_vbox), hbox, TRUE, TRUE, 0);
+    data->notebook = gtk_notebook_new();
+    gtk_box_pack_start(GTK_BOX(main_vbox), data->notebook, TRUE, TRUE, 0);
     
-    GtkWidget *left_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_box_pack_start(GTK_BOX(hbox), left_vbox, TRUE, TRUE, 0);
+    GtkWidget *menu_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+    gtk_container_set_border_width(GTK_CONTAINER(menu_tab), 15);
     
-    GtkWidget *menu_frame = gtk_frame_new("Меню");
-    gtk_box_pack_start(GTK_BOX(left_vbox), menu_frame, TRUE, TRUE, 0);
-    
-    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), 
+    GtkWidget *menu_scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(menu_scroll), 
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(menu_frame), scroll);
+    gtk_box_pack_start(GTK_BOX(menu_tab), menu_scroll, TRUE, TRUE, 0);
     
-    data->tree_view = gtk_tree_view_new();
-    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->tree_view), TRUE);
+    data->menu_tree_view = gtk_tree_view_new();
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->menu_tree_view), TRUE);
+    gtk_widget_set_size_request(data->menu_tree_view, 800, 600);
     
     GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
     GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes(
         "Название", renderer, "text", 0, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(data->tree_view), column);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(data->menu_tree_view), column);
     
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(
-        "Цена", renderer, "text", 1, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(data->tree_view), column);
+        "Цена (руб.)", renderer, "text", 1, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(data->menu_tree_view), column);
     
     GtkTreeSelection *selection = gtk_tree_view_get_selection(
-        GTK_TREE_VIEW(data->tree_view));
+        GTK_TREE_VIEW(data->menu_tree_view));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     g_signal_connect(selection, "changed", 
                      G_CALLBACK(on_tree_selection_changed), data);
-    g_signal_connect(data->tree_view, "row-activated",
+    g_signal_connect(data->menu_tree_view, "row-activated",
                      G_CALLBACK(on_row_activated), data);
+    g_signal_connect(data->menu_tree_view, "button-press-event",
+                     G_CALLBACK(on_tree_view_button_press), data);
     
-    gtk_container_add(GTK_CONTAINER(scroll), data->tree_view);
+    gtk_container_add(GTK_CONTAINER(menu_scroll), data->menu_tree_view);
     refresh_tree_view(data);
     
     GtkWidget *add_to_cart_button = gtk_button_new_with_label("Добавить в корзину");
-    gtk_box_pack_start(GTK_BOX(left_vbox), add_to_cart_button, FALSE, FALSE, 0);
+    gtk_style_context_add_class(gtk_widget_get_style_context(add_to_cart_button), "add-to-cart-button");
+    gtk_box_pack_start(GTK_BOX(menu_tab), add_to_cart_button, FALSE, FALSE, 0);
     g_signal_connect(add_to_cart_button, "clicked", G_CALLBACK(on_add_to_cart_clicked), data);
     
-    GtkWidget *right_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_box_pack_start(GTK_BOX(hbox), right_vbox, TRUE, TRUE, 0);
-    
-    GtkWidget *cart_frame = gtk_frame_new("Корзина");
-    gtk_box_pack_start(GTK_BOX(right_vbox), cart_frame, TRUE, TRUE, 0);
+    GtkWidget *cart_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+    gtk_container_set_border_width(GTK_CONTAINER(cart_tab), 15);
     
     GtkWidget *cart_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(cart_scroll), 
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(cart_frame), cart_scroll);
+    gtk_box_pack_start(GTK_BOX(cart_tab), cart_scroll, TRUE, TRUE, 0);
     
     data->cart_tree_view = gtk_tree_view_new();
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->cart_tree_view), TRUE);
+    gtk_widget_set_size_request(data->cart_tree_view, 800, 600);
     
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(
@@ -636,49 +722,63 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     gtk_container_add(GTK_CONTAINER(cart_scroll), data->cart_tree_view);
     
-    GtkWidget *cart_buttons_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_pack_start(GTK_BOX(right_vbox), cart_buttons_hbox, FALSE, FALSE, 0);
+    GtkWidget *cart_buttons_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    gtk_box_pack_start(GTK_BOX(cart_tab), cart_buttons_hbox, FALSE, FALSE, 0);
     
     GtkWidget *remove_button = gtk_button_new_with_label("Удалить выбранное");
+    gtk_style_context_add_class(gtk_widget_get_style_context(remove_button), "remove-button");
     gtk_box_pack_start(GTK_BOX(cart_buttons_hbox), remove_button, TRUE, TRUE, 0);
     g_signal_connect(remove_button, "clicked", G_CALLBACK(on_remove_from_cart_clicked), data);
     
     data->total_label = gtk_label_new("Итого: 0.00 руб.");
     gtk_style_context_add_class(gtk_widget_get_style_context(data->total_label), "total-label");
-    gtk_box_pack_end(GTK_BOX(right_vbox), data->total_label, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(cart_tab), data->total_label, FALSE, FALSE, 0);
     
     GtkWidget *checkout_button = gtk_button_new_with_label("Оплатить");
-    gtk_box_pack_start(GTK_BOX(right_vbox), checkout_button, FALSE, FALSE, 0);
+    gtk_style_context_add_class(gtk_widget_get_style_context(checkout_button), "checkout-button");
+    gtk_box_pack_start(GTK_BOX(cart_tab), checkout_button, FALSE, FALSE, 0);
     g_signal_connect(checkout_button, "clicked", G_CALLBACK(on_checkout_clicked), data);
     
-    GtkWidget *add_frame = gtk_frame_new("Добавить элемент");
-    gtk_box_pack_start(GTK_BOX(main_vbox), add_frame, FALSE, FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(data->notebook), menu_tab, gtk_label_new("Меню"));
+    gtk_notebook_append_page(GTK_NOTEBOOK(data->notebook), cart_tab, gtk_label_new("Корзина"));
     
-    GtkWidget *add_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *edit_tab = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+    gtk_container_set_border_width(GTK_CONTAINER(edit_tab), 15);
+    
+    GtkWidget *add_frame = gtk_frame_new("Добавить / Редактировать элемент");
+    gtk_style_context_add_class(gtk_widget_get_style_context(add_frame), "add-frame");
+    gtk_box_pack_start(GTK_BOX(edit_tab), add_frame, FALSE, FALSE, 0);
+    
+    GtkWidget *add_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
     gtk_container_add(GTK_CONTAINER(add_frame), add_box);
-    gtk_widget_set_margin_top(add_box, 10);
-    gtk_widget_set_margin_bottom(add_box, 10);
-    gtk_widget_set_margin_start(add_box, 10);
-    gtk_widget_set_margin_end(add_box, 10);
+    gtk_widget_set_margin_top(add_box, 15);
+    gtk_widget_set_margin_bottom(add_box, 15);
+    gtk_widget_set_margin_start(add_box, 15);
+    gtk_widget_set_margin_end(add_box, 15);
     
     data->name_entry = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(data->name_entry), "Название");
     gtk_box_pack_start(GTK_BOX(add_box), data->name_entry, TRUE, TRUE, 0);
     
     data->price_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(data->price_entry), "Цена (руб., опционально)");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(data->price_entry), "Цена (руб., пусто = категория)");
     gtk_box_pack_start(GTK_BOX(add_box), data->price_entry, TRUE, TRUE, 0);
     
     data->parent_combo = gtk_combo_box_text_new();
     gtk_box_pack_start(GTK_BOX(add_box), data->parent_combo, TRUE, TRUE, 0);
     
     GtkWidget *add_button = gtk_button_new_with_label("Добавить");
+    gtk_style_context_add_class(gtk_widget_get_style_context(add_button), "add-to-cart-button");
     gtk_box_pack_start(GTK_BOX(add_box), add_button, FALSE, FALSE, 0);
     g_signal_connect(add_button, "clicked", G_CALLBACK(on_add_item_clicked), data);
     
-    data->info_label = gtk_label_new("Выберите элемент из меню");
+    data->info_label = gtk_label_new("Правый клик на категории для добавления подкатегории");
     gtk_style_context_add_class(gtk_widget_get_style_context(data->info_label), "info-label");
-    gtk_box_pack_start(GTK_BOX(main_vbox), data->info_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(edit_tab), data->info_label, FALSE, FALSE, 0);
+    
+    gtk_notebook_append_page(GTK_NOTEBOOK(data->notebook), edit_tab, gtk_label_new("Редактирование"));
+    
+    update_parent_combo(data);
     
     g_signal_connect(window, "delete-event", G_CALLBACK(on_window_delete), data);
     gtk_widget_show_all(window);
