@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define MAX_ITEMS 200
 #define MAX_NAME_LEN 64
 #define MAX_PATH_LEN 256
+#define MAX_CART_ITEMS 50
 
 typedef struct MenuItem {
     char name[MAX_NAME_LEN];
@@ -18,6 +20,16 @@ typedef struct MenuItem {
 } MenuItem;
 
 typedef struct {
+    MenuItem *menu_item;
+    int quantity;
+} CartItem;
+
+typedef struct {
+    CartItem items[MAX_CART_ITEMS];
+    int count;
+} Cart;
+
+typedef struct {
     MenuItem *root;
     MenuItem *selected_item;
     GtkWidget *window;
@@ -26,7 +38,10 @@ typedef struct {
     GtkWidget *name_entry;
     GtkWidget *price_entry;
     GtkWidget *parent_combo;
+    GtkWidget *cart_tree_view;
+    GtkWidget *total_label;
     GtkCssProvider *css_provider;
+    Cart *cart;
 } AppData;
 
 static MenuItem* menu_item_create(const char *name, double price, int is_category) {
@@ -121,6 +136,45 @@ static void load_default_menu(MenuItem *root) {
     menu_item_add_child(desserts, milkshake);
 }
 
+static Cart* cart_create() {
+    Cart *cart = g_new0(Cart, 1);
+    return cart;
+}
+
+static void cart_add_item(Cart *cart, MenuItem *menu_item) {
+    if (!menu_item || menu_item->is_category) return;
+    
+    for (int i = 0; i < cart->count; i++) {
+        if (cart->items[i].menu_item == menu_item) {
+            cart->items[i].quantity++;
+            return;
+        }
+    }
+    
+    if (cart->count >= MAX_CART_ITEMS) return;
+    
+    cart->items[cart->count].menu_item = menu_item;
+    cart->items[cart->count].quantity = 1;
+    cart->count++;
+}
+
+static void cart_remove_item(Cart *cart, int index) {
+    if (index < 0 || index >= cart->count) return;
+    
+    for (int i = index; i < cart->count - 1; i++) {
+        cart->items[i] = cart->items[i + 1];
+    }
+    cart->count--;
+}
+
+static double cart_get_total(Cart *cart) {
+    double total = 0.0;
+    for (int i = 0; i < cart->count; i++) {
+        total += cart->items[i].menu_item->price * cart->items[i].quantity;
+    }
+    return total;
+}
+
 static gboolean load_css(AppData *app) {
     GError *error = NULL;
     app->css_provider = gtk_css_provider_new();
@@ -179,6 +233,7 @@ static void on_tree_selection_changed(GtkTreeSelection *selection, gpointer user
 static void on_row_activated(GtkTreeView *tree_view, GtkTreePath *path,
                              GtkTreeViewColumn *column, gpointer user_data) {
     (void)column;
+    AppData *app = (AppData *)user_data;
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeIter iter;
     
@@ -187,23 +242,149 @@ static void on_row_activated(GtkTreeView *tree_view, GtkTreePath *path,
         gchar *name;
         gchar *path_str;
         
-    gtk_tree_model_get(model, &iter,
+        gtk_tree_model_get(model, &iter,
                            0, &name,
                            2, &is_category,
                            3, &path_str,
                            -1);
         
-    if (is_category) {
-        if (gtk_tree_view_row_expanded(tree_view, path)) {
-            gtk_tree_view_collapse_row(tree_view, path);
+        if (is_category) {
+            if (gtk_tree_view_row_expanded(tree_view, path)) {
+                gtk_tree_view_collapse_row(tree_view, path);
+            } else {
+                gtk_tree_view_expand_to_path(tree_view, path);
+            }
         } else {
-            gtk_tree_view_expand_to_path(tree_view, path);
+            MenuItem *item = find_item_by_path(app->root, path_str);
+            if (item) {
+                cart_add_item(app->cart, item);
+                char info[128];
+                snprintf(info, sizeof(info), "Добавлено: %s (%.2f руб.)", item->name, item->price);
+                gtk_label_set_text(GTK_LABEL(app->info_label), info);
+            }
+        }
+        
+        g_free(name);
+        g_free(path_str);
+    }
+}
+
+static void on_add_to_cart_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    AppData *app = (AppData *)user_data;
+    
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->tree_view));
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        gchar *name;
+        gdouble price;
+        gboolean is_category;
+        gchar *path_str;
+        
+        gtk_tree_model_get(model, &iter,
+                           0, &name,
+                           1, &price,
+                           2, &is_category,
+                           3, &path_str,
+                           -1);
+        
+        if (!is_category) {
+            MenuItem *item = find_item_by_path(app->root, path_str);
+            if (item) {
+                cart_add_item(app->cart, item);
+                char info[128];
+                snprintf(info, sizeof(info), "Добавлено: %s (%.2f руб.)", item->name, item->price);
+                gtk_label_set_text(GTK_LABEL(app->info_label), info);
+            }
+        } else {
+            gtk_label_set_text(GTK_LABEL(app->info_label), "Выберите товар, а не категорию!");
+        }
+        
+        g_free(name);
+        g_free(path_str);
+    }
+}
+
+static void on_remove_from_cart_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    AppData *app = (AppData *)user_data;
+    
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(app->cart_tree_view));
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        int index;
+        gtk_tree_model_get(model, &iter, 2, &index, -1);
+        cart_remove_item(app->cart, index);
+        
+        double total = cart_get_total(app->cart);
+        char total_str[64];
+        snprintf(total_str, sizeof(total_str), "Итого: %.2f руб.", total);
+        gtk_label_set_text(GTK_LABEL(app->total_label), total_str);
+        
+        gtk_tree_view_set_model(GTK_TREE_VIEW(app->cart_tree_view), NULL);
+        GtkListStore *list_store = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_DOUBLE);
+        GtkTreeIter list_iter;
+        
+        for (int i = 0; i < app->cart->count; i++) {
+            gtk_list_store_append(list_store, &list_iter);
+            char quantity_str[32];
+            snprintf(quantity_str, sizeof(quantity_str), "%d шт.", app->cart->items[i].quantity);
+            gtk_list_store_set(list_store, &list_iter,
+                               0, app->cart->items[i].menu_item->name,
+                               1, quantity_str,
+                               2, i,
+                               3, app->cart->items[i].menu_item->price * app->cart->items[i].quantity,
+                               -1);
+        }
+        
+        gtk_tree_view_set_model(GTK_TREE_VIEW(app->cart_tree_view), GTK_TREE_MODEL(list_store));
+        g_object_unref(list_store);
+    }
+}
+
+static void on_checkout_clicked(GtkButton *button, gpointer user_data) {
+    (void)button;
+    AppData *app = (AppData *)user_data;
+    
+    if (app->cart->count == 0) {
+        gtk_label_set_text(GTK_LABEL(app->info_label), "Корзина пуста!");
+        return;
+    }
+    
+    double total = cart_get_total(app->cart);
+    
+    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(app->window),
+                                               GTK_DIALOG_MODAL,
+                                               GTK_MESSAGE_INFO,
+                                               GTK_BUTTONS_OK_CANCEL,
+                                               "Оплата\nСумма к оплате: %.2f руб.\n\nОтправить на терминал?", total);
+    gtk_window_set_title(GTK_WINDOW(dialog), "Оплата");
+    
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+        char total_str[64];
+        snprintf(total_str, sizeof(total_str), "%.2f", total);
+        
+        gchar *command = g_strdup_printf("echo '%.2f' | xargs -0 printf 'Сумма: %%s руб.\\n'", total);
+        int result = system(command);
+        g_free(command);
+        
+        if (result == 0) {
+            gtk_label_set_text(GTK_LABEL(app->info_label), "Заказ отправлен на оплату!");
+            
+            app->cart->count = 0;
+            double zero = 0.0;
+            gtk_label_set_text(GTK_LABEL(app->total_label), "Итого: 0.00 руб.");
+            gtk_tree_view_set_model(GTK_TREE_VIEW(app->cart_tree_view), NULL);
+        } else {
+            gtk_label_set_text(GTK_LABEL(app->info_label), "Ошибка отправки на терминал!");
         }
     }
     
-    g_free(name);
-    g_free(path_str);
-    }
+    gtk_widget_destroy(dialog);
 }
 
 static GtkTreeStore* create_tree_store() {
@@ -345,6 +526,7 @@ static gboolean on_window_delete(GtkWidget *widget, GdkEvent *event, gpointer us
     AppData *app = (AppData *)user_data;
     
     free_items_recursive(app->root);
+    g_free(app->cart);
     g_object_unref(app->css_provider);
     g_free(app);
     
@@ -356,12 +538,13 @@ static void activate(GtkApplication *app, gpointer user_data) {
     (void)user_data;
     AppData *data = g_new0(AppData, 1);
     data->root = menu_item_create("Меню", 0.0, TRUE);
+    data->cart = cart_create();
     load_default_menu(data->root);
     
     GtkWidget *window = gtk_application_window_new(app);
     data->window = window;
     gtk_window_set_title(GTK_WINDOW(window), "Кафе - Иерархическое меню");
-    gtk_window_set_default_size(GTK_WINDOW(window), 1024, 768);
+    gtk_window_set_default_size(GTK_WINDOW(window), 1400, 900);
     
     load_css(data);
     
@@ -380,10 +563,19 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_box_pack_end(GTK_BOX(header), fullscreen_button, FALSE, FALSE, 0);
     g_signal_connect(fullscreen_button, "toggled", G_CALLBACK(gtk_window_fullscreen), window);
     
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_box_pack_start(GTK_BOX(main_vbox), hbox, TRUE, TRUE, 0);
+    
+    GtkWidget *left_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_box_pack_start(GTK_BOX(hbox), left_vbox, TRUE, TRUE, 0);
+    
+    GtkWidget *menu_frame = gtk_frame_new("Меню");
+    gtk_box_pack_start(GTK_BOX(left_vbox), menu_frame, TRUE, TRUE, 0);
+    
     GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), 
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(main_vbox), scroll, TRUE, TRUE, 0);
+    gtk_container_add(GTK_CONTAINER(menu_frame), scroll);
     
     data->tree_view = gtk_tree_view_new();
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->tree_view), TRUE);
@@ -408,6 +600,56 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     gtk_container_add(GTK_CONTAINER(scroll), data->tree_view);
     refresh_tree_view(data);
+    
+    GtkWidget *add_to_cart_button = gtk_button_new_with_label("Добавить в корзину");
+    gtk_box_pack_start(GTK_BOX(left_vbox), add_to_cart_button, FALSE, FALSE, 0);
+    g_signal_connect(add_to_cart_button, "clicked", G_CALLBACK(on_add_to_cart_clicked), data);
+    
+    GtkWidget *right_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_box_pack_start(GTK_BOX(hbox), right_vbox, TRUE, TRUE, 0);
+    
+    GtkWidget *cart_frame = gtk_frame_new("Корзина");
+    gtk_box_pack_start(GTK_BOX(right_vbox), cart_frame, TRUE, TRUE, 0);
+    
+    GtkWidget *cart_scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(cart_scroll), 
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(cart_frame), cart_scroll);
+    
+    data->cart_tree_view = gtk_tree_view_new();
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(data->cart_tree_view), TRUE);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(
+        "Название", renderer, "text", 0, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(data->cart_tree_view), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(
+        "Кол-во", renderer, "text", 1, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(data->cart_tree_view), column);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(
+        "Сумма", renderer, "text", 3, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(data->cart_tree_view), column);
+    
+    gtk_container_add(GTK_CONTAINER(cart_scroll), data->cart_tree_view);
+    
+    GtkWidget *cart_buttons_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_box_pack_start(GTK_BOX(right_vbox), cart_buttons_hbox, FALSE, FALSE, 0);
+    
+    GtkWidget *remove_button = gtk_button_new_with_label("Удалить выбранное");
+    gtk_box_pack_start(GTK_BOX(cart_buttons_hbox), remove_button, TRUE, TRUE, 0);
+    g_signal_connect(remove_button, "clicked", G_CALLBACK(on_remove_from_cart_clicked), data);
+    
+    data->total_label = gtk_label_new("Итого: 0.00 руб.");
+    gtk_style_context_add_class(gtk_widget_get_style_context(data->total_label), "total-label");
+    gtk_box_pack_end(GTK_BOX(right_vbox), data->total_label, FALSE, FALSE, 0);
+    
+    GtkWidget *checkout_button = gtk_button_new_with_label("Оплатить");
+    gtk_box_pack_start(GTK_BOX(right_vbox), checkout_button, FALSE, FALSE, 0);
+    g_signal_connect(checkout_button, "clicked", G_CALLBACK(on_checkout_clicked), data);
     
     GtkWidget *add_frame = gtk_frame_new("Добавить элемент");
     gtk_box_pack_start(GTK_BOX(main_vbox), add_frame, FALSE, FALSE, 0);
