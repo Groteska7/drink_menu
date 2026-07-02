@@ -203,6 +203,7 @@ static void on_row_activated(GtkTreeView *tree_view, GtkTreePath *path,
     
     g_free(name);
     g_free(path_str);
+    }
 }
 
 static GtkTreeStore* create_tree_store() {
@@ -242,6 +243,7 @@ static void refresh_tree_view(AppData *app) {
 
 static void add_items_recursive(GtkListStore *list_store, GtkTreeIter *parent_iter,
                                 MenuItem *item, const char *path) {
+    (void)parent_iter;
     char item_path[MAX_PATH_LEN];
     snprintf(item_path, sizeof(item_path), "%s%s%s", 
              path ? path : "", path ? "/" : "", item->name);
